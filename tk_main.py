@@ -15,7 +15,6 @@
 _________________________________________________.
 @github/vedisys ©2024 ARR
 coffee?;send BTC: 3MZm5HF7USTC1RcNk2pTduHoZ6oBdw9pUs
-paypal?: sdzubiella@gmail.com
 """
 
 # req'd (in sequence)
