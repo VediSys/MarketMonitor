@@ -13,7 +13,7 @@
       triple Parabolic Stop And Reverse,
       dual Relative Strength Index, Volume.
 _________________________________________________.
-@github/vedisys ©1992-2024 ARR
+@github/vedisys ©2024 ARR
 coffee?;send BTC: 3MZm5HF7USTC1RcNk2pTduHoZ6oBdw9pUs
 paypal?: sdzubiella@gmail.com
 """
