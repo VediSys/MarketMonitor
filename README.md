@@ -1,6 +1,8 @@
 # MarketMonitor
 Pydroid-based market monitor script for Android 11.
-Requires additional Python installations from Pydroid such as matplotlib, mplfinance, numpy, tkinter, yfinance.
+Requires additional Python installations from Pydroid such as datetime, dateutil, matplotlib, mplfinance, numpy, pyti, six,
+tkinter, yfinance.
+
 Default is portrait mode.
 Download required custom files to same directory as 'tk_main.py'.
 
