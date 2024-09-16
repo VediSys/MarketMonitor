@@ -268,7 +268,7 @@ def main():
 	        linestyle='-.',linewidths=[2.2, 1.7],alpha=0.4),
 	    xlabel=(
 	        '•'+FILENAME+'•\n'+_t+' $'+str(curr_c)+'\n'+_tail),
-	    panel_ratios=( 4, 1, 1, 1, 1, 1), #volume=True,volume_panel=0, #5, #<--!
+	    panel_ratios=( 4, 1, 1, 1, 1, 1), volume=True,volume_panel=1, #<--!
 	    return_calculated_values=c_vals,show_nontrading=False,
 	    figratio=(12, 8),returnfig=True,figscale=1.75,figsize=(10.3, 20.5))
 	# remove window toolbar items; ignore 'item' error
