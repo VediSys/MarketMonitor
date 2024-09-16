@@ -38,7 +38,6 @@ from relative_strength import Relative
 from macd_signal       import Macd
 from commodity_channel import CCI #*-
 from williams_range    import WPR
-# decisi logicum plurare, prix
 from indicator_calcs  import \
     bb_calcs, laguerre_calcs, priceline_calcs
 # output style
@@ -49,13 +48,10 @@ from themestyle import \
 FILENAME = "tk_EA_B3L2P3R2.py"
 plt.rcParams['toolbar'] = 'toolmanager'
 
-# class def init():# T: 0-35, D: 0-13, I: 0-12
-#Ticker, Days, Interval, T_len, D_len, I_len = folio()
-
 # window header default items
 rpm = {0:'back',
     1:'forward',2:'help',3:'home',4:'pan',5:'save',
-    6:'subplots',7:'zoom'} #List,Show show
+    6:'subplots',7:'zoom'}
 
 # colours (0-12); in specific idx order!
 i_clr = ['dodgerblue', #,'lime' -g maroon
@@ -65,13 +61,12 @@ i_clr = ['dodgerblue', #,'lime' -g maroon
 F_CLR = '#505050' #i_clr[13]
 
 # application, indicator parameters.
-DEC = 2                       # default: 4
-GAMMA, THETA = 0.25, 0.75     # default: 0.75
-CURR, PREV, LAST = -1, -2, -3 # sets flow
+DEC = 2                       # decimal default: 4
+GAMMA, THETA = 0.25, 0.75     # Laguerre default: 0.75
+CURR, PREV, LAST = -1, -2, -3 # sets flow default
 # default: BB: 20, RSI: 14, 8, WPR: 14
 bb_p, rsia_p, rsib_p, wpr_p = 17, 5, 8,14
 fast,  slow,  ema  = 12,26, 9
-fast2, slow2, ema2 = 11,17, 5
 #up_mark, dn_mark = [],[]
 af1, af2, af3, am1, am2, am3 = ( # Parabolic SAR
     0.01, 0.02, 0.05,            # default: ...0.03,
