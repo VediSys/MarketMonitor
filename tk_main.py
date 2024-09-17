@@ -243,10 +243,10 @@ def main():
 	for _y in df_c:
 	    _ax[0].annotate('          '+str(_y),(df_len, _y),transform=_ax[0].transAxes,
 	        fontsize=10,color=i_clr[11],alpha=0.25)
-    # current quote on priceline in chart
+        # current quote on priceline in chart
 	_ax[0].annotate(str(_t)+'\n'+curr_str,(_d, curr_c),
 	    fontsize=10,color=i_clr[15],xytext=(_d, curr_c),alpha=0.7)
-    # (-)current date), ohlc in chart
+        # (-)current date), ohlc in chart
 	_ax[0].annotate( #f"{_d:} day(s) {_t:} [{_i:}]"
         #+f"\n{curr_rec.name.date().strftime('%A, %b/%e/%Y'):}"
 	    f"\nO: ${_df['Open'].iloc[CURR]:.2f}\nH: ${_df['High'].iloc[CURR]:.2f}" #(-) +f"\n
@@ -263,7 +263,7 @@ def main():
 	_ax[0].annotate(bb_il+"|",
 		xy=(len(_df), curr_c),textcoords='axes fraction',
 	    fontsize=leg_fnt,color=bb_il_clr,xytext=(0.01, 0.84)) #,alpha=0.85)
-    # laguerre decision logic type A
+        # laguerre decision logic type A
 	_ax[0].annotate(laga_i,xy=(len(_df),curr_c),textcoords='axes fraction',
 	    fontsize=24,color=laga_clr,xytext=(0.04,0.04))
 	# laguerre decision logic type B <--logic error
@@ -297,7 +297,7 @@ def main():
 		    xytext=(0.05, xy_txt[idx]), #!:indented
 		    bbox=dict(boxstyle='square',fc='k',alpha=0.55))
 	# -- _ax[2].text(xline=('.'),)
-    # prep tk buttons
+        # prep tk buttons
 	button1["background"], button1["foreground"] = ('lightgrey','blue')
 	button1["text"] = 'repeat'
 	# ---.
