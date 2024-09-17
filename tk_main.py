@@ -1,7 +1,6 @@
-#-*-utf-8-*-: Pydroid: tkinter ****reference version
-""" tk_main is:
-    tk_EA_BCLMPRW.py |393, №.3/5 base_arch 29072024. (++!)
-*23122023, last edit: 03082024: w/notes on further development
+#-*-utf-8-*-: Pydroid: tkinter
+""" tk_main.py |393
+*last edit: 03082024: w/notes on further development
 
     - All-in-one Pydroid periodic market monitor
       script using the yfinance API with
@@ -14,7 +13,7 @@
       dual Relative Strength Index, Volume.
 _________________________________________________.
 @github/vedisys ©2024 ARR
-coffee?;send BTC: 3MZm5HF7USTC1RcNk2pTduHoZ6oBdw9pUs
+coffee?, BTC: 3MZm5HF7USTC1RcNk2pTduHoZ6oBdw9pUs
 """
 
 # req'd (in sequence)
@@ -45,7 +44,7 @@ from themestyle import \
     Theme, Chart_Type, style_dict
 
 
-FILENAME = "tk_EA_B3L2P3R2.py"
+FILENAME = "tk_main.py"
 plt.rcParams['toolbar'] = 'toolmanager'
 
 # window header default items
@@ -66,7 +65,7 @@ GAMMA, THETA = 0.25, 0.75     # Laguerre default: 0.75
 CURR, PREV, LAST = -1, -2, -3 # sets flow default
 # default: BB: 20, RSI: 14, 8, WPR: 14
 bb_p, rsia_p, rsib_p, wpr_p = 17, 5, 8,14
-fast,  slow,  ema  = 12,26, 9
+fast,  slow,  ema  = 12,26, 9 # || 11,17, 5
 #up_mark, dn_mark = [],[]
 af1, af2, af3, am1, am2, am3 = ( # Parabolic SAR
     0.01, 0.02, 0.05,            # default: ...0.03,
@@ -101,39 +100,9 @@ def select_0(*args): # req'd to animate; ignore Pydroid error
     return
 
 
-"""def price_diff(_df): #, period=pf[2]):
-    #"" Intraday price change marker.""
-    up_mark, dn_mark = [],[]
-    for idx, row in _df.iterrows(): #for row in _df.iterrows():
-        diff = _df['Open'].iloc[row] -_df['Close'].iloc[row]
-        diff_pct = diff /_df['Open'].iloc[row]
-        if diff_pct > 0.05:
-            up_mark.append(row['Close'])
-            dn_mark.append(np.nan)
-        elif diff_pct < -0.05:
-            dn_mark.append(row['Close'])
-            up_mark.append(np.nan)
-        else:
-            up_mark.append(np.nan)
-            dn_mark.append(np.nan)
-    return np.array(up_mark, dn_mark)""
-""def save_png(_df, _t, _i):
-    "" ---.""
-    #_T, _I = (str(spin1.get()), str(spin3.get()))
-    fig, _ax = mpf.plot(_df,
-	    savefig=FILENAME+_t+'_'+_i+'.png')
-    return None""********************* """
-
-
-def tint_interpolations( #laga,lagb,
+def tint_interpolations(
     rsia,rsib,ccia,ccib,macd,signal):
 	ftint = ['royalblue','coral','cyan','lightblue','teal','salmon']
-	#fb_up1, fb_dn1 = ( # interpolated laguerre: panel 1
-	#    dict(y1=laga,y2=lagb,
-	#        where=lagb<=laga,color="#e06666",alpha=0.4,interpolate=True),
-	#    dict(y1=laga,y2=lagb,
-	#        where=lagb >laga,color="#93c47d",alpha=0.4,interpolate=True))
-	#fb_up1['panel'], fb_dn1['panel'] = 1, 1
 	# rsiA, rsiB in panel 2
 	fb_up2, fb_dn2 = (
 	    dict(y1=rsia,y2=rsib,where=rsib<=rsia,color="#93c47d",alpha=0.4,interpolate=True),
@@ -173,7 +142,6 @@ def main():
 	#-u-last_c = df_c.iloc[LAST] #last_o, last_c = df_o.iloc[LAST],
 	# ---.
 	#def indications():
-	#up_mark, dn_mark = price_diff(_df)
 	# main panel 0: bb
 	bb_u, bb_m, bb_l = (bb_up(df_c,bb_p),bb_mid(df_c,bb_p),bb_low(df_c,bb_p))
 	curr_bb_up, curr_bb_mid, curr_bb_low = (
@@ -210,9 +178,6 @@ def main():
 	# subpanel 5: macd
 	macd, signal, histogram = Macd(df_c,fast,slow,ema)
 	# panels
-	#up_mark_panel, dn_mark_panel = (
-	#    mpf.make_addplot(up_mark,color='orange',type='scatter',marker='v',markersize=100),
-	#    mpf.make_addplot(dn_mark,color='lime',type='scatter',marker='^',markersize=100))
 	bbu_panel, bbm_panel, bbl_panel = (
 	    mpf.make_addplot(bb_u,color=i_clr[0],linestyle='-'), #orig: '-'
 	    mpf.make_addplot(bb_m,color=i_clr[1],linestyle='-'), #orig: ':'
@@ -237,7 +202,7 @@ def main():
 	    mpf.make_addplot(macd,color=i_clr[0],panel=5,secondary_y=False),
 	    mpf.make_addplot(signal,color=i_clr[2],panel=5,secondary_y=False))
 	# pool panels for mplfinance figure
-	indicators = [ #up_mark_panel, dn_mark_panel,
+	indicators = [
 	    bbu_panel, bbm_panel, bbl_panel,
 	    sar1_panel,sar2_panel,sar3_panel,
 	    laga_panel, lagb_panel,
@@ -276,7 +241,6 @@ def main():
 	        curr_rec.name.date().strftime('%A, %b. %e/%Y'),
 	        _d, _t, _i, curr_str))
 	# axes values
-	#_ax[0].grid(False) # remove ax0 grid
 	# trading density in chart right
 	df_len, _y = len(_df), -1
 	for _y in df_c:
@@ -308,7 +272,7 @@ def main():
 	# laguerre decision logic type B <--logic error
 	_ax[0].annotate(lagb_i,xy=(len(_df),curr_c),textcoords='axes fraction',
 	    fontsize=22,color=lagb_clr,xytext=(0.24,0.04))
-	# subpanel annotations (0-13), *13 based on 6 indicators
+	# subpanel annotations
 	legend_array = (
 	    f"- BB  up ({ bb_p:}): {curr_bb_up:.2f}",
 	    f"- BBmid ({ bb_p:}): {curr_bb_mid:.2f}",
