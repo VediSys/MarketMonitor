@@ -34,7 +34,7 @@ from parabolic_sar2    import Parabolic
 from laguerre          import LaGuerre
 from relative_strength import Relative
 from macd_signal       import Macd
-from commodity_channel import CCI #*-
+from commodity_channel import CCI
 from williams_range    import WPR
 from indicator_calcs  import \
     bb_calcs, laguerre_calcs, priceline_calcs
@@ -119,7 +119,7 @@ def tint_interpolations(
 	        where=signal >macd,color="#e06666",alpha=0.5,interpolate=True))
 	fb_up5['panel'], fb_dn5['panel'] = 5, 5
 
-	return [ #fb_up1, fb_dn1,
+	return [
 	    fb_up2, fb_dn2,
 	    fb_up4, fb_dn4, fb_up5, fb_dn5]
 
