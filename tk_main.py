@@ -208,7 +208,6 @@ def main():
 	    wpr_panel, ccia_panel, ccib_panel,
 	    histogram_panel, signal_panel, macd_panel
 	    ]
-    # def output_to_ax_0()-------------------------|
 	interpolations = tint_interpolations(
 	    rsia,rsib,ccia,ccib,macd,signal)
 	calc_clr, price_clr, d_g = priceline_calcs(
