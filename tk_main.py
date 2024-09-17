@@ -25,7 +25,6 @@ import mplfinance as mpf
 from autosize  import obtain_quote
 from portfolio import folio
 # main panel indicators
-#from intraday_pricechange import price_diff
 from bollinger_bands import (
     upper_BB_band  as bb_up,
     middle_BB_band as bb_mid,
@@ -65,8 +64,7 @@ GAMMA, THETA = 0.25, 0.75     # Laguerre default: 0.75
 CURR, PREV, LAST = -1, -2, -3 # sets flow default
 # default: BB: 20, RSI: 14, 8, WPR: 14
 bb_p, rsia_p, rsib_p, wpr_p = 17, 5, 8,14
-fast,  slow,  ema  = 12,26, 9 # || 11,17, 5
-#up_mark, dn_mark = [],[]
+fast,  slow,  ema  = 12,26, 9 # MACD: 11,17, 5
 af1, af2, af3, am1, am2, am3 = ( # Parabolic SAR
     0.01, 0.02, 0.05,            # default: ...0.03,
     0.1,  0.2,  0.5)             # default: ...0.3)
