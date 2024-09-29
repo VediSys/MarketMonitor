@@ -1,32 +1,33 @@
-#-*-utf-8-*-: Pydroid
-""" tk_main.py |400
-    - base_architecture: *23122023
-    - last edit: 17092024, w/development notes.
+#-*-utf-8-*-: Pydroid: last edit: 28092024
+""" tk_main.py |<400: *23122023, Android 11+
 
-    - All-in-one Pydroid periodic market monitor
-      script using the 'yfinance' API with
-      custom indicators, data acquisition,
-      portfolio and theme scripts.
+      for auto-didactic purposes with
+      architectural / development notes
 
-    - displays window of axes in figure with:
-      Bollinger Bands, dual LaGuerre and Volume,
+      yfinance market monitor script with
+      data acquisition, portfolio, indicator
+      interpolations and theme scripts
+
+      i.e., displays window of axes in figure with
+      candlesticks,
+      Bollinger Bands,
       triple Parabolic Stop And Reverse,
-      dual Relative Strength Index.
+      dual LaGuerre and Volume,
+      dual Relative Strength Index,
+      dual Commodity Channel Index,
+      MACD
 _________________________________________________.
 @github/vedisys ©2024 ARR
 coffee?;send BTC: 3MZm5HF7USTC1RcNk2pTduHoZ6oBdw9pUs
 """
 
-# req'd (in sequence)
 import tkinter as tk
 import numpy   as np
 import matplotlib.pyplot as plt
-import mplfinance as mpf
-# custom scripts (11)
+import mplfinance        as mpf
+
 from autosize  import obtain_quote
 from portfolio import folio
-# main panel indicators
-#from intraday_pricechange import price_diff
 from bollinger_bands import (
     upper_BB_band  as bb_up,
     middle_BB_band as bb_mid,
@@ -34,12 +35,11 @@ from bollinger_bands import (
 from parabolic_sar2    import Parabolic
 from laguerre          import LaGuerre
 from relative_strength import Relative
-from macd_signal       import Macd
-from commodity_channel import CCI
 from williams_range    import WPR
-from indicator_calcs  import \
+from commodity_channel import CCI
+from macd_signal       import Macd
+from indicator_calcs import \
     bb_calcs, laguerre_calcs, priceline_calcs
-# output style
 from themestyle import \
     Theme, Chart_Type, style_dict
 
@@ -47,35 +47,33 @@ from themestyle import \
 FILENAME = "tk_main.py"
 plt.rcParams['toolbar'] = 'toolmanager'
 
-# class def init():# T: 0-36, D: 0-13, I: 0-12
-#Ticker, Days, Interval, T_len, D_len, I_len = folio()
+# def __init__ tkinter window header default items
+rpm = {
+    0:'back',1:'forward',2:'help',3:'home',
+    4:'pan',5:'save',6:'subplots',7:'zoom'}
 
-# window header default items
-rpm = {0:'back',
-    1:'forward',2:'help',3:'home',4:'pan',
-    5:'save',6:'subplots',7:'zoom'}
-# colours (0-12); in specific idx order!
+# colours (0-12); in matched idx sequence!
 i_clr = ['dodgerblue','khaki','orangered',
 	'dodgerblue','khaki','orangered',
-	'dodgerblue','plum',
+	'aqua','orangered', #'dodgerblue','plum',
 	'dodgerblue','orangered','khaki',
 	'chartreuse','c','orangered',
 	'darkslategrey','white']
 F_CLR = '#505050' #i_clr[13]
 
-# application, indicator parameters.
+# application parameters
 DEC = 2                       # default: 4
-GAMMA, THETA = 0.25, 0.75     # default: 0.75
-CURR, PREV, LAST = -1, -2, -3 # sets flow
-# default: BB: 20, RSI: 14, 8, WPR: 14
-bb_p, rsia_p, rsib_p, wpr_p = 17, 5, 8,14
-fast,  slow,  ema  = 12,26, 9 # macdefault: 11,17, 5
-#up_mark, dn_mark = [],[]
+CURR, PREV, LAST = -1, -2, -3 # sets logicus
+# indicator parameters
 af1, af2, af3, am1, am2, am3 = ( # Parabolic SAR
     0.01, 0.02, 0.05,            # default: ...0.03,
     0.1,  0.2,  0.5)             # default: ...0.3)
+# default: BB: 20, RSI: 14, 8, WPR: 14
+bb_p, rsia_p, rsib_p, wpr_p = 17, 5, 8,14
+fast, slow, ema = 12,26, 9       # macd: 11,17, 5
+GAMMA, THETA = 0.25, 0.75        # LaGuerre: 0.75
 ccia_p, ccib_p = 17,23           # dual CCI (a,b)
-CCI_RND = 10000000               # cci rounding factor
+CCI_RND = 10000000               # cci rounding factor #: !+work
 
 
 def exit_app():
@@ -88,11 +86,10 @@ def clear_all():
     spin1.delete(0,8) #: 0,END)
     spin2.delete(0,3) #: 0,END)
     spin3.delete(0,3) #: 0,END)
-
     return
 
 
-def select_0(*args): # req'd to animate; ignore Pydroid error
+def select_0(): #*args): # req'd to scroll; ignore Pydroid error
     """ load spinbox text into button text"""
     button1["background"] = i_clr[1]
     button1["text"] = ("Click to view "
@@ -100,31 +97,7 @@ def select_0(*args): # req'd to animate; ignore Pydroid error
         +spin2.get()+" days, ["
         +spin3.get()+"] period.")
     button1.grid(row=2, column=0, columnspan=2)
-
     return
-
-
-"""def price_diff(_df): #, period=pf[2]):
-    #"" Intraday price change marker.""
-    up_mark, dn_mark = [],[]
-    for idx, row in _df.iterrows(): #for row in _df.iterrows():
-        diff = _df['Open'].iloc[row] -_df['Close'].iloc[row]
-        diff_pct = diff /_df['Open'].iloc[row]
-        if diff_pct > 0.05:
-            up_mark.append(row['Close'])
-            dn_mark.append(np.nan)
-        elif diff_pct < -0.05:
-            dn_mark.append(row['Close'])
-            up_mark.append(np.nan)
-        else:
-            up_mark.append(np.nan)
-            dn_mark.append(np.nan)
-    return np.array(up_mark, dn_mark)""
-""def save_png(_df, _t, _i):
-    "" ---.""
-    #_T, _I = (str(spin1.get()), str(spin3.get()))
-    #fig, _ax = mpf.plot(_df,savefig=FILENAME+_t+'_'+_i+'.png')
-    return None"""
 
 
 def tint_interpolations( #laga,lagb,
@@ -160,22 +133,24 @@ def tint_interpolations( #laga,lagb,
 
 
 def main():
-	""" ---."""
+	""" Pydroid tkinter."""
 	button1["background"] = 'lightgrey'
+
 	# reset parameters, obtain new parameters
 	_t, _d, _i = "",0,""
 	_t, _d, _i = str(spin1.get()),int(spin2.get()),str(spin3.get())
-	# obtain OHLC feed quotes via yfinance
+
+	# obtain OHLC feed of quotes via yfinance
 	_df, df_o, df_h, df_l, df_c = obtain_quote(_t, _d, _i, DEC)
-	_tail = str(_df.tail(3)) # extract last 3 file records
-	# alias to simplify inline logic modifications
+	_tail = str(_df.tail(3)) # extract last 3 records as check
+
+	# alias's to assist inline logicus mods (for now)
 	curr_rec, curr_str = _df.iloc[CURR],str(df_c.iloc[CURR])
 	curr_o, curr_c = df_o.iloc[CURR],df_c.iloc[CURR]
 	prev_h, prev_c = df_h.iloc[PREV],df_c.iloc[PREV]
 	#-u-last_c = df_c.iloc[LAST] #last_o, last_c = df_o.iloc[LAST],
-	# ---.
+
 	#def indications(_df, df_o, df_h, df_l, df_c):
-	#up_mark, dn_mark = price_diff(_df)
 	# main panel 0: bb
 	bb_u, bb_m, bb_l = (bb_up(df_c,bb_p),bb_mid(df_c,bb_p),bb_low(df_c,bb_p))
 	curr_bb_up, curr_bb_mid, curr_bb_low = (
@@ -190,33 +165,39 @@ def main():
 	    curr_bb_up, curr_bb_mid, curr_bb_low,
 	    prev_bb_up, prev_bb_mid, prev_bb_low,
 	    last_bb_mid) #last_bb_up, , last_bb_low)
-	# main panel 0: psar
+
+	# main panel 0: triple psar
 	sar1, sar2, sar3 = (Parabolic(df_h,df_l,af1,am1,_df),
 	    Parabolic(df_h,df_l,af2,am2,_df),Parabolic(df_h,df_l,af3,am3,_df))
 	curr_sar1, curr_sar2, curr_sar3 = (
 	    np.round(sar1[CURR],DEC),np.round(sar2[CURR],DEC),np.round(sar3[CURR],DEC))
-	# subpanel 1: laguerre; volume in same panel
+
+	# subpanel 1: laguerre; volume in same panel!
 	laga, lagb = LaGuerre(_df,GAMMA),LaGuerre(_df,THETA)
 	curr_laga, curr_lagb = np.round(laga[CURR],DEC),np.round(lagb[CURR],DEC)
 	# 'La Guerre' calcs
 	laga_clr, laga_i, lagb_clr, lagb_i = laguerre_calcs(_df,laga,lagb,CURR,PREV)
-	# subpanel 2: rsi
+
+	# subpanel 2: dual rsi
 	rsia, rsib = Relative(df_c,rsia_p,DEC),Relative(df_c,rsib_p,DEC)
 	curr_rsi_a, curr_rsi_b = np.round(rsia[CURR],DEC),np.round(rsib[CURR],DEC)
+
 	# subpanel 3: williams % range
 	wpr = WPR(df_c, df_h, df_l, wpr_p)
 	curr_wpr = np.round(wpr.iloc[CURR],DEC)
-	# subpanel 4: cci
+
+	# subpanel 4: dual cci
 	ccia, ccib = CCI(df_c,df_h,df_l,ccia_p),CCI(df_c,df_h,df_l,ccib_p)
 	curr_cci_a, curr_cci_b = np.round(ccia[CURR]/CCI_RND,DEC),np.round(ccib[CURR]/CCI_RND,DEC)
+
 	# subpanel 5: macd
 	macd, signal, histogram = Macd(df_c,fast,slow,ema)
 	curr_macd, curr_signal, curr_histogram = (np.round(macd.iloc[CURR],DEC),
 	    np.round(signal.iloc[CURR],DEC),np.round(histogram.iloc[CURR],DEC))
-	# plot panels
-	#up_mark_panel, dn_mark_panel = (
-	#    mpf.make_addplot(up_mark,color='orange',type='scatter',marker='v',markersize=100),
-	#    mpf.make_addplot(dn_mark,color='lime',type='scatter',marker='^',markersize=100))
+	#return (bb_u, bb_m, bb_l, sar1, sar2, sar3,
+	#    laga, lagb, rsia, rsib, wpr, ccia, ccib,
+	#    macd, signal, histogram)
+	# ||def plot_axes_panels():
 	bbu_panel, bbm_panel, bbl_panel = (
 	    mpf.make_addplot(bb_u,color=i_clr[0],linestyle='-'), #orig: '-'
 	    mpf.make_addplot(bb_m,color=i_clr[1],linestyle='-'), #orig: ':'
@@ -240,8 +221,9 @@ def main():
 	        color=i_clr[1],panel=5,type='bar',width=0.5,alpha=0.6,secondary_y=True),
 	    mpf.make_addplot(macd,color=i_clr[0],panel=5,secondary_y=False),
 	    mpf.make_addplot(signal,color=i_clr[2],panel=5,secondary_y=False))
-	# pool panels for mplfinance figure
-	indicators = [ #up_mark_panel, dn_mark_panel,
+
+	# pool axes panels for mplfinance figure
+	indicators = [
 	    bbu_panel, bbm_panel, bbl_panel,
 	    sar1_panel,sar2_panel,sar3_panel,
 	    laga_panel, lagb_panel,
@@ -249,12 +231,15 @@ def main():
 	    wpr_panel, ccia_panel, ccib_panel,
 	    histogram_panel, signal_panel, macd_panel
 	    ]
+	#return
     # def output_to_ax_0()-------------------------|
-	interpolations = tint_interpolations( #laga,lagb,
-	    rsia,rsib,ccia,ccib,macd,signal)
+	interpolations = tint_interpolations( #laga, lagb,
+	    rsia, rsib, ccia, ccib, macd, signal)
 	calc_clr, price_clr, d_g = priceline_calcs(
-	    curr_o,curr_c,prev_h,prev_c,curr_rsi_a,curr_rsi_b,DEC)
+	    curr_o, curr_c, prev_h, prev_c,
+	    curr_rsi_a, curr_rsi_b, DEC)
 	c_vals, leg_fnt = {}, 19
+
 	# figure values
 	fig, _ax = mpf.plot(_df,fill_between=interpolations,
 	    style=mpf.make_mpf_style(base_mpf_style=Theme(3),
@@ -269,36 +254,45 @@ def main():
 	    panel_ratios=( 4, 1, 1, 1, 1, 1), volume=True,volume_panel=1, #05, #<--!
 	    return_calculated_values=c_vals,show_nontrading=False,
 	    figratio=(12, 8),returnfig=True,figscale=1.75,figsize=(10.3, 20.5))
+
 	# remove window toolbar items
 	for idx, item in enumerate(rpm, start=0):
 		fig.canvas.manager.toolmanager.remove_tool(
 		    rpm[item])
+
 	# last quote details in window border
 	fig.canvas.manager.set_window_title(
 	    '%s    %i days of %s [%s]    $%s' % ( #FILENAME, #||
 	        curr_rec.name.date().strftime('%A, %b. %e/%Y'),
 	        _d, _t, _i, curr_str))
-	# axes values
+
 	#_ax[0].grid(False) # remove ax0 grid
+
 	# trading density in chart right
 	df_len, _y = len(_df), -1
 	for _y in df_c:
-	    _ax[0].annotate('          '+str(_y),(df_len, _y),transform=_ax[0].transAxes,
+	    _ax[0].annotate('          '
+	        +str(_y),(df_len, _y),transform=_ax[0].transAxes,
 	        fontsize=10,color=i_clr[11],alpha=0.25)
+
     # current quote on priceline in chart
 	_ax[0].annotate(str(_t)+'\n'+curr_str,(_d, curr_c),
 	    fontsize=10,color=i_clr[15],xytext=(_d, curr_c),alpha=0.7)
-    # (-)current date), ohlc in chart
+
+    # - current date!, + ohlc in chart
 	_ax[0].annotate( #f"{_d:} day(s) {_t:} [{_i:}]"
         #+f"\n{curr_rec.name.date().strftime('%A, %b/%e/%Y'):}"
 	    f"\nO: ${_df['Open'].iloc[CURR]:.2f}\nH: ${_df['High'].iloc[CURR]:.2f}" #(-) +f"\n
 	    +f"\nL: ${_df['Low'].iloc[CURR]:.2f}\nC: ${_df['Close'].iloc[CURR]:.2f}\n", #<<==!!
 		xy=(len(_df), curr_c),textcoords='axes fraction',
 	    fontsize=leg_fnt,color=i_clr[1],xytext=(0.01, 1.0)) #,alpha=0.85)
+
+	# MACD values outside chart
 	_ax[0].annotate(f"MACD ({fast:},{slow:},{ema:}): {curr_macd:.3f}"
-	    +f"\n               Signal: {curr_signal:.3f}\n         Histogram: {curr_histogram:.3f}\n",
+	    +f"\n               Signal: {curr_signal:.3f}\n        Histogram: {curr_histogram:.3f}\n",
 	    xy=(len(_df), curr_c), textcoords='axes fraction',
 	    fontsize=18, color='beige', xytext=(0.5, 1.0))
+
 	# bb decision logic
 	_ax[0].annotate(bb_ih+"|",
 		xy=(len(_df), curr_c),textcoords='axes fraction',
@@ -309,12 +303,14 @@ def main():
 	_ax[0].annotate(bb_il+"|",
 		xy=(len(_df), curr_c),textcoords='axes fraction',
 	    fontsize=leg_fnt,color=bb_il_clr,xytext=(0.01, 0.84)) #,alpha=0.85)
+
     # laguerre decision logic type A
 	_ax[0].annotate(laga_i,xy=(len(_df),curr_c),textcoords='axes fraction',
 	    fontsize=24,color=laga_clr,xytext=(0.04,0.04))
 	# laguerre decision logic type B <--logic error
 	_ax[0].annotate(lagb_i,xy=(len(_df),curr_c),textcoords='axes fraction',
 	    fontsize=22,color=lagb_clr,xytext=(0.24,0.04))
+
 	# subpanel annotations
 	legend_array = (
 	    f"- BB  up ({ bb_p:}): {curr_bb_up:.2f}",
@@ -331,34 +327,33 @@ def main():
 	    f"- WPR({wpr_p:}): {curr_wpr/10:.2f}",
 	    f"- CCI({ccia_p:}): {curr_cci_a:.2f}",
 	    f"- CCI({ccib_p:}): {curr_cci_b:.2f}")
-	xy_txt = (0.96,
+	legend_pos = (0.96,
 	    0.90,0.84,0.77,0.71,0.65,
 	    0.58,0.52,0.45,0.39,0.33,
-	    0.26,0.19,0.13) #,0.07,0.0)
-	for idx, item in enumerate(xy_txt, start=0):
-		_ax[0].annotate(
-		    legend_array[idx],
-		    xy=(len(xy_txt), curr_c),textcoords='axes fraction',
+	    0.26,0.19,0.13) #,0.07,0.0) #!:~+work
+	for idx, item in enumerate(legend_pos, start=0):
+		_ax[0].annotate(legend_array[idx],
+		    xy=(len(legend_pos), curr_c),textcoords='axes fraction',
 		    fontsize=leg_fnt,color=i_clr[idx],
-		    xytext=(0.05, xy_txt[idx]), #!:indented
+		    xytext=(0.05, legend_pos[idx]), #!:indented
 		    bbox=dict(boxstyle='square',fc='k',alpha=0.45))
-	# -- _ax[2].text(xline=('.'),)
+	
     # prep tk buttons
 	button1["background"], button1["foreground"] = ('lightgrey','blue')
 	button1["text"] = 'repeat'
-	# ---.
+
 	plt.ion()  # non-blocking window
 	plt.show() # run GUI
 
 	return
 
 
-if __name__ == "__main__" : # main dialogue window
+if __name__ == "__main__" : # tkinter dialogue window
     window = tk.Tk()
     window.configure(background='darkslategrey',border=0) #'#969798',border=0)
     #window.overrideredirect(True) # revert to borderless window
     window.geometry('1000x250')
-    window.title('Enter ticker, days, interval for Bollinger, LaGuerre, PSAR, RSI, Vol')
+    window.title('Enter ticker, days, interval')
     # spinbox selection parameters
     Ticker, Days, Interval, T_len, D_len, I_len = folio()
     spin1, spin2, spin3 = (
@@ -379,8 +374,6 @@ if __name__ == "__main__" : # main dialogue window
             text=" ∅ ",command=clear_all),
         tk.Button(window,fg=fg_clr,bg="coral",relief='raised',font=("Consolas 5"),
             text="Exit",command=exit_app)) #command=exit))#window.destroy())
-    #button4 = tk.Button(window,fg=fg_clr,bg="coral",relief=tk.RAISED,font=("Consolas 5"),
-    #    text="Save", command=save_png)
     # widgets placement
     spin1.grid(  row=0, column=0)
     spin2.grid(  row=0, column=1)
