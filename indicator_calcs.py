@@ -1,5 +1,5 @@
 # indicator_calcs.py |73
-# logic expansion-oriented architecture
+# logic expansion architecture
 import numpy as np
 
 
