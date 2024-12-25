@@ -16,3 +16,5 @@ Display default is set to portrait mode.
       Bollinger Bands, dual LaGuerre,
       triple Parabolic Stop And Reverse,
       dual Relative Strength Index, Volume.
+
+*!:alternate main version is 'tk_main3i.py' as of 23122024
