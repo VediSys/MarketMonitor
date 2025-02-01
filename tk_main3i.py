@@ -379,7 +379,7 @@ if __name__ == "__main__" : # tkinter dialogue window
         background='darkslategrey',border=0) #'#969798',border=0)
     #window.overrideredirect(True) # revert to borderless window
     root.geometry('1000x250')
-    root.title('Enter ticker, days, interval')
+    root.title('Enter ticker, range, interval')
     # spinbox selection parameters
     Ticker,Days,Interval,T_len,D_len,I_len = folio()
     spin1, spin2, spin3 = (
